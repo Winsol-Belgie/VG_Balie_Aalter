@@ -538,6 +538,22 @@
   // Re-render on resize (iPad rotation)
   window.addEventListener('resize', function() { render(); });
 
+  // Swipe navigatie
+  var swipeStartX = 0;
+  var swipeStartY = 0;
+  document.addEventListener('touchstart', function(e) {
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - swipeStartX;
+    var dy = e.changedTouches[0].clientY - swipeStartY;
+    if (Math.abs(dx) < 50) return;           // te kort, geen swipe
+    if (Math.abs(dy) > Math.abs(dx)) return; // eerder verticaal dan horizontaal
+    if (dx < 0) { changeDay(1); }            // swipe links → volgende dag
+    else        { changeDay(-1); }           // swipe rechts → vorige dag
+  }, { passive: true });
+
   /* ---- Boot ---- */
   document.getElementById('room-label').textContent = CONFIG.roomLabel;
   renderNav();
