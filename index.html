@@ -313,10 +313,11 @@
 
   /* ---- Normalize ---- */
   function norm(e) {
-    const startIso = e.start?.dateTime ? e.start.dateTime+'Z' : e.start;
-    const endIso   = e.end?.dateTime   ? e.end.dateTime+'Z'   : e.end;
+    const startIso = (e.start && e.start.dateTime) ? e.start.dateTime+'Z' : e.start;
+    const endIso   = (e.end   && e.end.dateTime)   ? e.end.dateTime+'Z'   : e.end;
+    var orgEmail = (e.organizer && e.organizer.emailAddress) ? e.organizer.emailAddress : null;
     const org = typeof e.organizer==='object'
-      ? (e.organizer?.emailAddress?.name || e.organizer?.emailAddress?.address || '—')
+      ? (orgEmail && (orgEmail.name || orgEmail.address) || '—')
       : (e.organizer||'—');
 
     // Count attendees from Graph API array (exclude room resources)
@@ -400,7 +401,7 @@
     renderTimeline(events, today, now);
 
     /* Footer */
-    const syncTime = cachedData?.synced ? new Date(cachedData.synced) : null;
+    const syncTime = (cachedData && cachedData.synced) ? new Date(cachedData.synced) : null;
     const age = syncTime ? Math.round((now-syncTime)/60000) : null;
     const stale = age!==null && age>20;
     document.getElementById('sync-info').innerHTML = syncTime
@@ -413,8 +414,13 @@
   function renderTimeline(events, today, now) {
     const wrap = document.getElementById('timeline-outer');
     const inner = document.getElementById('timeline-inner');
-    const availH = wrap.clientHeight;
-    if (availH < 10) { setTimeout(()=>render(),100); return; }
+    var availH = wrap.clientHeight;
+    // Fallback for older iPads where clientHeight may be 0 during first render
+    if (availH < 10) {
+      var fixedH = window.innerHeight - wrap.getBoundingClientRect().top - 24;
+      availH = fixedH > 50 ? fixedH : 0;
+    }
+    if (availH < 10) { setTimeout(function(){ render(); }, 300); return; }
 
     // Hour range
     let H0 = CONFIG.dayStart, H1 = CONFIG.dayEnd;
@@ -496,19 +502,19 @@
   }
 
   // Update now-line every minute without full re-render
-  setInterval(() => {
-    const line = document.getElementById('now-line');
+  setInterval(function() {
+    var line = document.getElementById('now-line');
     if (!line) return;
-    const wrap = document.getElementById('timeline-outer');
-    const H0 = CONFIG.dayStart, H1 = CONFIG.dayEnd;
-    const PX = wrap.clientHeight / Math.max(1, H1 - H0);
-    const now = new Date();
-    const nH = now.getHours() + now.getMinutes()/60;
+    var wrap = document.getElementById('timeline-outer');
+    var H0 = CONFIG.dayStart, H1 = CONFIG.dayEnd;
+    var PX = wrap.clientHeight / Math.max(1, H1 - H0);
+    var now = new Date();
+    var nH = now.getHours() + now.getMinutes()/60;
     line.style.top = ((nH - H0) * PX) + 'px';
   }, 60000);
 
   // Re-render on resize (iPad rotation)
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', function() { render(); });
 
   /* ---- Boot ---- */
   document.getElementById('room-label').textContent = CONFIG.roomLabel;
