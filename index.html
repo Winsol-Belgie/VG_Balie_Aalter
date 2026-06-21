@@ -465,18 +465,24 @@
       return;
     }
 
-    // Gray-band hours (e.g. 7-8, 12-13, 18-19)
-    const GRAY_BANDS = [7, 12, 18];
+    // Gray bands: start and end in fractional hours (e.g. 12.5 = 12u30)
+    const GRAY_BANDS = [
+      { start: 7,    end: 8    },  // 07:00 – 08:00
+      { start: 12.5, end: 13.5 },  // 12:30 – 13:30
+      { start: 18,   end: 19   }   // 18:00 – 19:00
+    ];
 
     let html = `<div style="position:relative;height:${availH}px;">`;
     html += `<div class="hour-sep"></div>`;
 
     // Gray bands (drawn first, behind everything)
-    GRAY_BANDS.forEach(bh => {
-      if (bh >= H0 && bh < H1) {
-        const by = (bh - H0) * PX;
-        html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${PX}px;background:#f3f4f6;z-index:0;"></div>`;
-      }
+    GRAY_BANDS.forEach(function(band) {
+      if (band.end <= H0 || band.start >= H1) return; // buiten bereik
+      var clampedStart = Math.max(band.start, H0);
+      var clampedEnd   = Math.min(band.end,   H1);
+      var by = (clampedStart - H0) * PX;
+      var bh = (clampedEnd - clampedStart) * PX;
+      html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${bh}px;background:#f3f4f6;z-index:0;"></div>`;
     });
 
     // Hour lines
