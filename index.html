@@ -23,14 +23,18 @@
 
   <style>
     :root {
-      color-scheme: light;
-      --yellow: #FFC800;
+      color-scheme: dark;
+      --yellow:      #FFC800;
       --yellow-dark: #E6B400;
-      --black:  #1A1A1A;
-      --red:    #dc2626;
-      --gray:   #9ca3af;
-      --border: #e5e7eb;
-      --bg:     #f8f8f8;
+      --black:       #0a0a0a;
+      --red:         #ef4444;
+      --gray:        #6b7280;
+      --border:      #2a2a2a;
+      --bg:          #111111;
+      --surface:     #1c1c1c;
+      --surface2:    #242424;
+      --text:        #e5e5e5;
+      --text-muted:  #6b7280;
     }
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -39,6 +43,7 @@
       overflow: hidden;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
+      color: var(--text);
     }
 
     #app {
@@ -70,7 +75,7 @@
 
     /* ── Day nav ── */
     .day-nav {
-      background: #fff;
+      background: var(--surface);
       border-bottom: 2px solid var(--yellow);
       padding: 7px 18px;
       display: flex;
@@ -79,20 +84,20 @@
       flex-shrink: 0;
     }
     .nav-btn {
-      background: var(--bg);
+      background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 5px 14px;
       font-size: 1.1rem;
       cursor: pointer;
-      color: var(--black);
+      color: var(--text);
       line-height: 1;
       font-weight: 700;
     }
     .nav-btn:active { background: var(--border); }
     .nav-today {
       background: var(--yellow);
-      color: var(--black);
+      color: #000;
       border-color: var(--yellow);
       font-size: .78rem;
       font-weight: 800;
@@ -105,19 +110,19 @@
       text-align: center;
       font-size: .95rem;
       font-weight: 700;
-      color: var(--black);
+      color: var(--text);
     }
 
     /* ── Status panel ── */
     .status-panel {
-      background: #fff;
+      background: var(--surface);
       margin: 10px 14px 6px;
       border-radius: 10px;
       padding: 14px 18px;
       display: flex;
       align-items: center;
       gap: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
+      box-shadow: 0 2px 8px rgba(0,0,0,.4);
       flex-shrink: 0;
       border-left: 5px solid var(--yellow);
     }
@@ -134,36 +139,35 @@
     }
     .vrij  {
       background: var(--yellow);
-      color: var(--black);
+      color: #000;
     }
     .bezet {
       background: var(--red);
       color: #fff;
-      box-shadow: 0 3px 10px rgba(220,38,38,.3);
+      box-shadow: 0 3px 10px rgba(239,68,68,.4);
     }
-    .neutral { background: var(--gray); color: #fff; }
+    .neutral { background: #333; color: var(--text-muted); }
 
     .status-info { flex: 1; min-width: 0; }
     .s-title {
-      font-size: 1.1rem; font-weight: 800; color: var(--black);
+      font-size: 1.1rem; font-weight: 800; color: var(--text);
       margin-bottom: 3px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .s-line  { font-size: .82rem; color: #6b7280; margin-bottom: 2px; }
-    .s-line strong { color: var(--black); }
-    .s-next  { font-size: .78rem; color: #6b7280; margin-top: 5px; }
+    .s-line  { font-size: .82rem; color: var(--text-muted); margin-bottom: 2px; }
+    .s-line strong { color: var(--text); }
+    .s-next  { font-size: .78rem; color: var(--text-muted); margin-top: 5px; }
 
     /* ── Timeline ── */
     .timeline-outer {
       flex: 1;
       overflow: hidden;
       position: relative;
-      background: #fff;
+      background: var(--surface);
       margin: 0 14px 0;
       border-radius: 10px 10px 0 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,.3);
     }
-    /* inner fills the full outer — labels live at left:0, events start at LBL_W */
     .timeline-inner {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -176,7 +180,7 @@
     .half-line {
       position: absolute;
       left: 0; right: 0;
-      border-top: 1px dashed #f3f4f6;
+      border-top: 1px dashed #1f1f1f;
     }
     .hour-lbl {
       position: absolute;
@@ -185,13 +189,12 @@
       text-align: right;
       padding-right: 7px;
       font-size: .78rem;
-      color: #555;
+      color: #888;
       font-variant-numeric: tabular-nums;
       transform: translateY(-50%);
       white-space: nowrap;
       font-weight: 700;
     }
-    /* vertical separator between label column and event area */
     .hour-sep {
       position: absolute;
       top: 0; bottom: 0;
@@ -205,13 +208,13 @@
       border-radius: 7px;
       padding: 4px 8px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,.15);
+      box-shadow: 0 2px 5px rgba(0,0,0,.4);
     }
-    .mtg-block.past    { background: #e5e7eb; color: #6b7280; }
+    .mtg-block.past    { background: #2a2a2a; color: #555; }
     .mtg-block.current { background: var(--red); color: #fff; }
-    .mtg-block.soon    { background: var(--yellow); color: var(--black); }
+    .mtg-block.soon    { background: var(--yellow); color: #000; }
     .mtg-name { font-weight: 800; font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mtg-time { font-size: .64rem; opacity: .8; margin-top: 1px; }
+    .mtg-time { font-size: .64rem; opacity: .7; margin-top: 1px; }
 
     .now-line {
       position: absolute;
@@ -240,7 +243,7 @@
     }
     .stale { color: var(--yellow); font-weight: 700; }
 
-    .empty { text-align: center; color: var(--gray); padding: 28px; font-size: .88rem; }
+    .empty { text-align: center; color: var(--text-muted); padding: 28px; font-size: .88rem; }
   </style>
 </head>
 <body>
@@ -482,7 +485,7 @@
       var clampedEnd   = Math.min(band.end,   H1);
       var by = (clampedStart - H0) * PX;
       var bh = (clampedEnd - clampedStart) * PX;
-      html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${bh}px;background:#f3f4f6;z-index:0;"></div>`;
+      html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${bh}px;background:#151515;z-index:0;"></div>`;
     });
 
     // Hour lines
