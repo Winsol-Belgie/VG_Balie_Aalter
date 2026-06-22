@@ -35,6 +35,11 @@
       --surface2:    #242424;
       --text:        #e5e5e5;
       --text-muted:  #6b7280;
+      --band-dark:   #131313;   /* ← kleur grijze banden (7-8, pauze, 18-19) */
+      --band-light:  #242424;   /* ← kleur actieve blokken (8-12:30, 13:30-18) */
+      --past-bg:     #303030;   /* ← achtergrond afgelopen meetings */
+      --past-fg:     #888888;   /* ← tekstkleur afgelopen meetings */
+      --hour-color:  #cccccc;   /* ← kleur uurlabels en uurlijnen */
     }
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -175,12 +180,14 @@
     .hour-line {
       position: absolute;
       left: 0; right: 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--hour-color);
+      opacity: .25;
     }
     .half-line {
       position: absolute;
       left: 0; right: 0;
-      border-top: 1px dashed #1f1f1f;
+      border-top: 1px dashed var(--hour-color);
+      opacity: .08;
     }
     .hour-lbl {
       position: absolute;
@@ -189,11 +196,12 @@
       text-align: right;
       padding-right: 7px;
       font-size: .78rem;
-      color: #888;
+      color: var(--hour-color);   /* ← uurlabel kleur */
       font-variant-numeric: tabular-nums;
       transform: translateY(-50%);
       white-space: nowrap;
       font-weight: 700;
+      opacity: 1;
     }
     .hour-sep {
       position: absolute;
@@ -210,7 +218,7 @@
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,.4);
     }
-    .mtg-block.past    { background: #2a2a2a; color: #555; }
+    .mtg-block.past    { background: var(--past-bg); color: var(--past-fg); }  /* ← afgelopen meetings */
     .mtg-block.current { background: var(--red); color: #fff; }
     .mtg-block.soon    { background: var(--yellow); color: #000; }
     .mtg-name { font-weight: 800; font-size: .78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -468,24 +476,27 @@
       return;
     }
 
-    // Gray bands: start and end in fractional hours (e.g. 12.5 = 12u30)
-    const GRAY_BANDS = [
-      { start: 7,    end: 8    },  // 07:00 – 08:00
-      { start: 12.5, end: 13.5 },  // 12:30 – 13:30
-      { start: 18,   end: 19   }   // 18:00 – 19:00
+    // Banden met kleur — gebruik CSS-variabelen uit :root voor aanpassingen
+    // start/end in decimale uren: 12.5 = 12u30, 13.5 = 13u30
+    var BANDS = [
+      { start: 7,    end: 8,    css: 'var(--band-dark)'  },  // 07:00–08:00 donker
+      { start: 8,    end: 12.5, css: 'var(--band-light)' },  // 08:00–12:30 licht (voormiddag)
+      { start: 12.5, end: 13.5, css: 'var(--band-dark)'  },  // 12:30–13:30 donker (pauze)
+      { start: 13.5, end: 18,   css: 'var(--band-light)' },  // 13:30–18:00 licht (namiddag)
+      { start: 18,   end: 19,   css: 'var(--band-dark)'  }   // 18:00–19:00 donker
     ];
 
     let html = `<div style="position:relative;height:${availH}px;">`;
     html += `<div class="hour-sep"></div>`;
 
-    // Gray bands (drawn first, behind everything)
-    GRAY_BANDS.forEach(function(band) {
-      if (band.end <= H0 || band.start >= H1) return; // buiten bereik
+    // Banden tekenen (achteraan, onder alles)
+    BANDS.forEach(function(band) {
+      if (band.end <= H0 || band.start >= H1) return;
       var clampedStart = Math.max(band.start, H0);
       var clampedEnd   = Math.min(band.end,   H1);
       var by = (clampedStart - H0) * PX;
       var bh = (clampedEnd - clampedStart) * PX;
-      html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${bh}px;background:#151515;z-index:0;"></div>`;
+      html += `<div style="position:absolute;left:0;right:0;top:${by}px;height:${bh}px;background:${band.css};z-index:0;"></div>`;
     });
 
     // Hour lines
