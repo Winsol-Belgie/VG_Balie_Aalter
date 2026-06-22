@@ -39,7 +39,8 @@
       --band-light:  #242424;   /* ← kleur actieve blokken (8-12:30, 13:30-18) */
       --past-bg:     #303030;   /* ← achtergrond afgelopen meetings */
       --past-fg:     #888888;   /* ← tekstkleur afgelopen meetings */
-      --hour-color:  #ffffff;   /* ← kleur uurlabels en uurlijnen */
+      --hour-line:   #cccccc;   /* ← kleur uurlijnen */
+      --hour-label:  #ffffff;   /* ← kleur uurlabels (tekst) */
     }
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
@@ -180,13 +181,13 @@
     .hour-line {
       position: absolute;
       left: 0; right: 0;
-      border-top: 1px solid var(--hour-color);
+      border-top: 1px solid var(--hour-line);
       opacity: .25;
     }
     .half-line {
       position: absolute;
       left: 0; right: 0;
-      border-top: 1px dashed var(--hour-color);
+      border-top: 1px dashed var(--hour-line);
       opacity: .08;
     }
     .hour-lbl {
@@ -196,7 +197,7 @@
       text-align: right;
       padding-right: 7px;
       font-size: .78rem;
-      color: var(--hour-color);   /* ← uurlabel kleur */
+      color: var(--hour-label);   /* ← uurlabel kleur */
       font-variant-numeric: tabular-nums;
       transform: translateY(-50%);
       white-space: nowrap;
